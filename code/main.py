@@ -1,6 +1,5 @@
 from settings import *
-from player import Player
-from ball import Ball
+from sprites import Player, Ball
 
 class Game:
     def __init__(self):
@@ -10,8 +9,9 @@ class Game:
         self.fps = 0.0
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
-        self.player = Player(pos=POS['player'], groups=self.all_sprites)
-        self.ball = Ball(pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), groups=self.all_sprites)
+        self.paddle_sprites = pygame.sprite.Group()
+        self.player = Player(pos=POS['player'], groups=(self.all_sprites, self.paddle_sprites))
+        self.ball = Ball(pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), groups=(self.all_sprites, self.paddle_sprites))
 
 
     def show_fps(self):
