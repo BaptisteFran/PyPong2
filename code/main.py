@@ -1,5 +1,5 @@
 from settings import *
-from sprites import Player, Ball
+from sprites import Player, Ball, Opponent
 
 class Game:
     def __init__(self):
@@ -11,7 +11,8 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.paddle_sprites = pygame.sprite.Group()
         self.player = Player(pos=POS['player'], groups=(self.all_sprites, self.paddle_sprites))
-        self.ball = Ball(pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), groups=(self.all_sprites, self.paddle_sprites))
+        self.ball = Ball(pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), groups=self.all_sprites, paddle_sprites=self.paddle_sprites)
+        self.opponent = Opponent(pos=POS['opponent'], ball=self.ball, groups=(self.all_sprites, self.paddle_sprites))
 
 
     def show_fps(self):
@@ -20,7 +21,7 @@ class Game:
 
     def run(self):
         while self.running:
-            dt = self.clock.tick() / 1000
+            dt = self.clock.tick(60) / 1000
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
