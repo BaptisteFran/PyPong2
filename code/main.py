@@ -1,5 +1,6 @@
 from settings import *
 from sprites import Player, Ball, Opponent
+from groups import AllSprites
 
 class Game:
     def __init__(self):
@@ -8,12 +9,39 @@ class Game:
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.fps = 0.0
         self.clock = pygame.time.Clock()
-        self.all_sprites = pygame.sprite.Group()
+
+        # sprites
+        self.all_sprites = AllSprites()
         self.paddle_sprites = pygame.sprite.Group()
         self.player = Player(pos=POS['player'], groups=(self.all_sprites, self.paddle_sprites))
-        self.ball = Ball(pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), groups=self.all_sprites, paddle_sprites=self.paddle_sprites)
+        self.ball = Ball(pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), groups=self.all_sprites, paddle_sprites=self.paddle_sprites, update_score=self.update_score)
         self.opponent = Opponent(pos=POS['opponent'], ball=self.ball, groups=(self.all_sprites, self.paddle_sprites))
 
+        # score
+        with open(join('data', 'score.txt')) as score_file:
+            try:
+                self.score = json.load(score_file)
+            except:
+                self.score = {'player': 0, 'opponent': 0}
+
+        self.font = pygame.font.Font(None, 160)
+
+    def display_score(self):
+        # player
+        player_surf = self.font.render(str(self.score['player']), True, COLORS['bg detail'])
+        player_rect = player_surf.get_frect(center = (WINDOW_WIDTH / 2 + 100, WINDOW_HEIGHT / 2))
+        self.display_surface.blit(player_surf, player_rect)
+
+        # opponent
+        opponent_surf = self.font.render(str(self.score['opponent']), True, COLORS['bg detail'])
+        opponent_rect = opponent_surf.get_frect(center=(WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT / 2))
+        self.display_surface.blit(opponent_surf, opponent_rect)
+
+        # line separator
+        pygame.draw.line(self.display_surface, COLORS['bg detail'], (WINDOW_WIDTH / 2, 0), (WINDOW_WIDTH / 2, WINDOW_HEIGHT), 5)
+
+    def update_score(self, side):
+        self.score['player' if side == 'player' else 'opponent'] += 1
 
     def show_fps(self):
         self.fps = "%.2f" % self.clock.get_fps()
@@ -26,13 +54,16 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    with open(join('data', 'score.txt'), 'w') as score_file:
+                        json.dump(self.score, score_file)
 
             # update
             self.all_sprites.update(dt)
 
             # draw
             self.display_surface.fill(COLORS['bg'])
-            self.all_sprites.draw(self.display_surface)
+            self.display_score()
+            self.all_sprites.draw()
 
             # show fps in game title
             self.show_fps()

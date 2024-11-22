@@ -1,5 +1,6 @@
 import pygame
 from os.path import join
+import json
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720 
 SIZE = {'paddle': (40,100), 'ball': (30,30)}
@@ -10,5 +11,6 @@ COLORS = {
     'paddle shadow': '#b12521',
     'ball': '#ee622c',
     'ball shadow': '#c14f24',
-    'bg': '#002633'
+    'bg': '#002633',
+    'bg detail': '#004a63',
 }
